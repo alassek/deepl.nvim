@@ -1,6 +1,7 @@
 local M = {}
 local config = require('deepl.config')
 local api = require('deepl.api')
+local ui = require('deepl.ui')
 
 function M.translate(opts)
     local source_lang = opts.args ~= "" and opts.args:upper() or nil
@@ -14,7 +15,7 @@ function M.translate(opts)
 
     -- Handle line selection
     if #lines == 1 then
-        selected_text = line[1]:sub(start_pos[3], end_pos[3])
+        selected_text = lines[1]:sub(start_pos[3], end_pos[3])
     else
         lines[1] = lines[1]:sub(start_pos[3])
         lines[#lines] = lines[#lines]:sub(1, end_pos[3])
@@ -35,46 +36,6 @@ function M.translate(opts)
     end
 end
 
-function M.model(name)
-    if name == nil then
-        vim.ui.select(
-            config.model_types,
-            { prompt = "Select DeepL model type:" },
-            M.model
-        )
-        return
-    end
-
-    config.set('model_type', name)
-end
-
-function M.formality(level)
-    if level == nil then
-        vim.ui.select(
-            config.formality_levels,
-            { prompt = "Select DeepL formality:" },
-            M.formality
-        )
-        return
-    end
-
-    config.set('formality', level)
-end
-
-function M.chooser(opt)
-    if opt == "" then
-        vim.ui.select(
-            {"model", "formality"},
-            { prompt = "Configure DeepL settings:" },
-            M.chooser
-        )
-    end
-
-    if M[opt] then
-        M[opt]()
-    end
-end
-
 function M.setup(opts)
     config.setup(opts)
 
@@ -84,7 +45,7 @@ function M.setup(opts)
         desc = 'Translate selected text using DeepL API',
     })
 
-    vim.api.nvim_create_user_command('DeepL', function(opts) M.chooser(opts.args) end, {
+    vim.api.nvim_create_user_command('DeepL', function(opts) ui.Menu(opts.args) end, {
         nargs = '?',
         desc = 'Configure DeepL settings',
     })

@@ -1,3 +1,5 @@
+require 'deepl.util'
+
 local C = {
     defaults = {
         api_endpoint = "https://api.deepl.com",
@@ -21,21 +23,45 @@ local C = {
     settings = {},
 }
 
-local function merge(tbl1, tbl2)
-    for k, v in pairs(tbl2) do
-        tbl1[k] = v
-    end
-    return tbl1
-end
+local buffer_local = { "model_type", "formality", "target_lang" }
 
 function C.setup(opts)
     opts = opts or {}
-    merge(C.settings, C.defaults)
-    merge(C.settings, opts)
+    local settings = {}
+
+    table.merge(settings, C.defaults)
+    table.merge(settings, opts)
+
+    for setting, value in pairs(settings) do
+        if table.contains(buffer_local, setting) then
+            vim.g["deepl_" .. setting] = value
+            settings[setting] = nil
+        end
+    end
+
+    table.merge(C.settings, settings)
 end
 
-function C.set(key, value)
-    merge(C.settings, {[key] = value})
-end
+setmetatable(C, {
+    __index = {
+        get = function(self, setting)
+            if table.contains(buffer_local, setting) then
+                setting = "deepl_" .. setting
+                return vim.b[setting] or vim.g[setting]
+            end
+
+            return self.settings[setting]
+        end,
+        set = function(self, setting, value)
+            if table.contains(buffer_local, setting) then
+                setting = "deepl_" .. setting
+                vim.b[setting] = value
+                return
+            end
+
+            self.settings[setting] = value
+        end,
+    },
+})
 
 return C

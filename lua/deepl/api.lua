@@ -1,7 +1,7 @@
 local M = {}
 
 local curl = require('plenary.curl')
-local config = require('deepl.config').settings
+local config = require('deepl.config')
 
 local diag_ns = vim.api.nvim_create_namespace("deepl")
 local user_agent = "neovim/" .. tostring(vim.version()) .. " (deepl.nvim)"
@@ -19,22 +19,20 @@ local function http_error(status, message)
 end
 
 function M.translate(text, source_lang)
-    if config.api_token == "" then
-        http_error(0, "DeepL API token is not set.")
-        return
-    end
+    local api_token = config:get('api_token')
+    assert(api_token ~= "", "DeepL API token is not set")
 
-    local url = config.api_endpoint .. "/v2/translate"
+    local url = config:get('api_endpoint') .. "/v2/translate"
     local body = {
         text = {text},
         source_lang = source_lang,
-        target_lang = config.target_lang,
-        model_type = config.model_type,
-        formality = config.formality,
+        target_lang = config:get('target_lang'),
+        model_type = config:get('model_type'),
+        formality = config:get('formality'),
     }
     local response = curl.post(url, {
         headers = {
-            ["Authorization"] = "DeepL-Auth-Key " .. config.api_token,
+            ["Authorization"] = "DeepL-Auth-Key " .. api_token,
             ["Content-Type"] = "application/json",
             ["User-Agent"] = user_agent,
         },
