@@ -22,7 +22,7 @@ function M.translate(text, source_lang)
     local api_token = config:get('api_token')
     assert(api_token ~= "", "DeepL API token is not set")
 
-    local url = config:get('api_endpoint') .. "/v2/translate"
+    local url = config:endpoint(api_token) .. "/v2/translate"
     local body = {
         text = {text},
         source_lang = source_lang,

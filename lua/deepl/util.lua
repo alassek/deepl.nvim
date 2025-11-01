@@ -10,6 +10,10 @@ function string.titleize(str)
     end):gsub("_", " ")
 end
 
+function string.ends_with(str, ending)
+    return ending == "" or str:sub(-#ending) == ending
+end
+
 function table.merge(left, right)
     for k, v in pairs(right) do
         left[k] = v

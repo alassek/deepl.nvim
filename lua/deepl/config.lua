@@ -2,11 +2,14 @@ require 'deepl.util'
 
 local C = {
     defaults = {
-        api_endpoint = "https://api.deepl.com",
         api_token = "",
         target_lang = "EN-US",
         model_type = "quality_optimized",
         formality = "default",
+    },
+    endpoints = {
+        free = "https://api-free.deepl.com",
+        pro = "https://api.deepl.com",
     },
     model_types = {
         "quality_optimized",
@@ -60,6 +63,13 @@ setmetatable(C, {
             end
 
             self.settings[setting] = value
+        end,
+        endpoint = function(self, token)
+            if string.ends_with(token, ':fx') then
+                return self.endpoints.free
+            end
+
+            return self.endpoints.pro
         end,
     },
 })
