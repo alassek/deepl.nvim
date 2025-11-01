@@ -7,6 +7,12 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ## [Unreleased]
 
+## [0.1.1] - 2025-11-01
+
+### Fixed
+
+- Text-selection bugs related to 'V' or multiline selections.
+
 ## [0.1.0] - 2025-10-31
 
 Initial release.
